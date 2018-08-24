@@ -1,0 +1,33 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+module:testrunner
+
+GET     /                                       App.Index
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/*filepath                       Static.Serve("public")
+
+# Catch all
+#*       /:controller/:action                    :controller.:action
+
+
+GET     /books                                  CBook.GetAll
+GET     /books/:bookID                          CBook.GetByID
+PUT	    /books									CBook.Put
+POST    /books/:bookID							CBook.Post
+DELETE  /books/:bookID						    CBook.DeleteByID 
+GET     /readers                                CReader.GetAll
+GET     /readers/:readerID                      CReader.GetByID
+PUT	    /readers								CReader.Put
+POST    /readers/:readerID						CReader.Post
+DELETE  /readers/:readerID						CReader.DeleteByID 
+GET     /orders                                 COrder.GetAll
+GET     /orders/:orderID                        COrder.GetByID
+PUT	    /orders								    COrder.Put
+POST    /orders/:orderID						COrder.Post
+DELETE  /orders/:orderID						COrder.DeleteByID 

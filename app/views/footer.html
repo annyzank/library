@@ -1,0 +1,21 @@
+  {{if eq .RunMode "dev"}}
+    {{template "debug.html" .}}
+  {{end}}
+	<script src="/public/js/App.js"></script>
+	<script src="/public/js/BookModel.js"></script>
+	<script src="/public/js/BookView.js"></script>
+	<script src="/public/js/BookController.js"></script>
+	<script src="/public/js/ReaderModel.js"></script>
+	<script src="/public/js/ReaderView.js"></script>
+	<script src="/public/js/ReaderController.js"></script>
+	<script src="/public/js/OrderModel.js"></script>
+	<script src="/public/js/OrderView.js"></script>
+	<script src="/public/js/OrderController.js"></script>
+	<script src="/public/js/data.js"></script>
+	<script src="/public/js/UIelements.js"></script>
+	<script src="/public/js/mainJS.js"></script>
+	<script>
+	    document.addEventListener("DOMContentLoaded", main());
+	</script>
+  </body>
+</html>
