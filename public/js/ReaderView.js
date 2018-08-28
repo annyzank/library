@@ -6,20 +6,28 @@ ReaderView.prototype.setMainLabel = function(count) {
 	$$("labelReaders").setValue("Всего читателей библиотеки: " + count)
 }
 
+ReaderView.prototype.error = function(errText) {	
+	webix.message({
+	    text: errText,
+	    type:"error"
+	});
+}
+
 ReaderView.prototype.showReaders = function(readerList) {	
+
+	var rdrTable = $$("readers");
 	if(!this._flag) {
-		var rdrTable = $$("readers");
-		rdrTable.define("data", readerList);
 		rdrTable.define("columns",[
 	        { id:"Id",    header:"", width:50},
 	        { id:"Name",   header:"Имя", fillspace:true},
 	        { id:"Surname",    header:"Фамилия", fillspace:true},
 	        { id:"Year",   header:"Год рождения", width:100}
 	    ]);
-		//rdrTable.define("template", "#id#. Имя: #readerName#, фамилия: #readerSurname#, год рождения: #year#.");
 
 		this._flag = true;
 	}
+
+	rdrTable.define("data", readerList);
 	rdrTable.refresh();
 }
 
@@ -83,9 +91,9 @@ ReaderView.prototype.showChangeWindowReader = function() {
 		$$("addReaderConfirm").hide();
 
 		
-		$$("readerName").setValue(selChR.readerName);
-		$$("readerSurname").setValue(selChR.readerSurname);
-		$$("year").setValue(selChR.year);
+		$$("readerName").setValue(selChR.Name);
+		$$("readerSurname").setValue(selChR.Surname);
+		$$("year").setValue(selChR.Year);
 	} else {
 	    webix.alert({
 			type: "alert-error",
@@ -98,11 +106,13 @@ ReaderView.prototype.changeReaderInfo = function() {
 	var newRN = $$("readerName").getValue();
 	var newRS = $$("readerSurname").getValue();
 	var newY = $$("year").getValue();
+	newY = Number(newY);
 
 	var chRdr = $$("readers").getSelectedItem();
-	var newReaderObj = new Reader(newRN, newRS, newY);
-	newReaderObj.id = chRdr.id;
-	$$("readers").updateItem(chRdr.id, newReaderObj);
+	var newReaderObj = new Readr(newRN, newRS, newY);
+	newReaderObj.Id = chRdr.Id;
+	newReaderObj.id = chRdr.Id;
+	$$("readers").updateItem(chRdr.Id, newReaderObj);
 
 	newReaderWin.hide();
 

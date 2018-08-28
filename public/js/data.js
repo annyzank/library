@@ -31,6 +31,7 @@ function Book(bookName, author, bookYear) {
 }
 
 function Bok(bookName, author, bookYear) {
+	this.Id = 0;
 	this.Name = bookName;
 	this.Author = author;
 	this.Year = bookYear;
@@ -46,16 +47,35 @@ function Reader(readerName, readerSurname, year) {
 }
 
 function Readr(readerName, readerSurname, year) {
+	this.Id = 0;
 	this.Name = readerName;
 	this.Surname = readerSurname;
 	this.Year = year;
 }
 
 function Order(orderReader, orderBook, lastDay) {
-	this.id = 0;
-	this.orderReader = orderReader;
-	this.orderBook = orderBook;
-	this.lastDay = lastDay;
+	this.Id = 0;
+	this.Reader = orderReader;
+	this.Book = orderBook;
+	this.LastDay = lastDay;
 	this.deleted = false;
-	orderBook.access = false;
+	//orderBook.access = false;
+}
+
+function OrderForUI(name, readerName, readerSurname, data, lastDay) {
+	this.Id = 0;
+	this.Name = name;
+	this.ReaderName = readerName;
+	this.ReaderSurname = readerSurname;
+	this.LastDay = lastDay;
+	this.data = data;
+	this.deleted = false;
+}
+
+function BookForUI(bookName, author, bookYear) {
+	this.id = 0;
+	this.Name = bookName;
+	this.Author = author;
+	this.Year = bookYear;
+	this.Access = true;
 }

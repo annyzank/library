@@ -19,7 +19,7 @@ func (c *CBook) GetAll() revel.Result {
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	return c.RenderJson(bks)
+	return c.RenderJson(response.Success(bks))
 }
 
 func (c *CBook) GetByID(bookID int) revel.Result {
@@ -28,7 +28,7 @@ func (c *CBook) GetByID(bookID int) revel.Result {
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	return c.RenderJson(bk)
+	return c.RenderJson(response.Success(bk))
 }
 
 func (c *CBook) Put() revel.Result {
@@ -39,12 +39,11 @@ func (c *CBook) Put() revel.Result {
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	id, err := c.provider.Create(b)
-	b.Id = id
+	crBook, err := c.provider.Create(b)
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	return c.RenderJson(response.Success(b))
+	return c.RenderJson(response.Success(crBook))
 }
 
 func (c *CBook) Post(bookID int) revel.Result {

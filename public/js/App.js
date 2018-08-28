@@ -9,5 +9,5 @@ App.prototype.run = function() {
 	this._bookController.attachBookEvents();
 	this._readerController.attachReaderEvents();
 	this._orderController.attachOrderEvents();
-	var b = 6;
 }
+

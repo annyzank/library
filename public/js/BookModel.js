@@ -5,21 +5,28 @@ function BookModel(listBooks) {
 	}
 }
 
-BookModel.prototype.getBooks = function(a) {	
+BookModel.prototype.getBooks = function(show, error) {	
 	$.ajax({
         type: "GET",
         url: "/books",
 		success: function(data, status){
-    		for (var i = 0; i < data.length; i++) {
-    			data[i].id = data[i].Id
-    		}
-    		a(data);
+			console.log(data);
+			if (!data.Status) {
+				error(data.ErrText);
+				return;
+			} else {
+				if (data.Data != null) {
+		    		for (var i = 0; i < data.Data.length; i++) {
+		    			data.Data[i].id = data.Data[i].Id
+		    		}
+	    		}
+	    		show(data.Data); 
+	    	}
 		}
 	});
 };
 
-BookModel.prototype.addBook = function(book, a) {
-	console.log(book);
+BookModel.prototype.addBook = function(book, showAdded, error) {
 	if (book != null) {
 		$.ajax({
 		    type: "PUT",
@@ -31,50 +38,58 @@ BookModel.prototype.addBook = function(book, a) {
 			}),
 			contentType: "application/json",
 			success: function(data, status){
-				console.log(data);
-				a(data.Data);
+	    		console.log(data);
+				if (!data.Status) {
+					error(data.ErrText);
+					return;
+				} else {
+					data.Data.id = data.Data.Id;
+					showAdded(data.Data);
+				}
 			}
 		});
 	}
-	// if (book != null) {
-	// 	this._listBooks.push(book);
-	// }
 };
 
 
-BookModel.prototype.deleteBook = function(id) {
+BookModel.prototype.deleteBook = function(id, error) {
 	if (id != null) {
 		$.ajax({
 	        type: "DELETE",
 	        url: "/books/" + id,
 			success: function(data, status){
 	    		console.log(data);
+	    		if (!data.Status) {
+					error(data.ErrText);
+					return;
+				}
 			}
 		});
 	}
 
-	// if (id != null) {
-	// 	var delIndex;
-	// 	for (var i = 0; i < this._listBooks.length; i++) {
-	// 		if (this._listBooks[i].id == id) {
-	// 			delIndex = i;
-	// 		}
-	// 	}
-	// 	this._listBooks[delIndex].deleted = true; 
-	// 	this._listBooks.splice(delIndex, 1);
-	// }
-
 };
 
-BookModel.prototype.returnWantedId = function() {
-	return this._listBooks[this._listBooks.length - 1].id + 1;
-};
 
 BookModel.prototype.changeBook = function(newBook) {
-	for (var i = 0; i < this._listBooks.length; i++) {
-		if (this._listBooks[i].id == newBook.id) {
-			var index = i;
+	$.ajax({
+        type: "POST",
+        url: "/books/" + newBook.Id,
+		data: JSON.stringify({
+			Name: newBook.Name,
+			Author: newBook.Author,
+			Year: newBook.Year
+		}),
+		contentType: "application/json",
+		success: function(data, status){
+    		console.log(data);
+	    	if (!data.Status) {
+				error(data.ErrText);
+				return;
+			}
 		}
-	}
-	this._listBooks[index] = newBook;
+	});
 };
+
+// BookModel.prototype.returnWantedId = function() {
+// 	return this._listBooks[this._listBooks.length - 1].id + 1;
+// };

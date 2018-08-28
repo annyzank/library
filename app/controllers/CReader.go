@@ -17,7 +17,7 @@ func (c *CReader) GetAll() revel.Result {
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	return c.RenderJson(rdrs)
+	return c.RenderJson(response.Success(rdrs))
 }
 
 func (c *CReader) GetByID(readerID int) revel.Result {
@@ -26,7 +26,7 @@ func (c *CReader) GetByID(readerID int) revel.Result {
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	return c.RenderJson(rdr)
+	return c.RenderJson(response.Success(rdr))
 }
 
 func (c *CReader) Put() revel.Result {
@@ -37,12 +37,11 @@ func (c *CReader) Put() revel.Result {
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	id, err := c.provider.Create(r)
-	r.Id = id
+	crReader, err := c.provider.Create(r)
 	if err != nil {
 		return c.RenderJson(response.Fail(err.Error()))
 	}
-	return c.RenderJson(response.Success(r))
+	return c.RenderJson(response.Success(crReader))
 }
 
 func (c *CReader) Post(readerID int) revel.Result {

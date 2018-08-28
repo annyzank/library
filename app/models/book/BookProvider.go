@@ -30,7 +30,7 @@ func (p *BookProvider) Initialization() error  {
 
 func (p *BookProvider) ReadAll() ([]Book, error) {
     p.Initialization()
-    rows, err := p.dbwrk.DB.Query("SELECT * FROM t_book ORDER BY id")
+    rows, err := p.dbwrk.DB.Query("SELECT id, name, author, year, access FROM t_book ORDER BY id")
     if err != nil {
         return nil, err
     }
@@ -39,42 +39,51 @@ func (p *BookProvider) ReadAll() ([]Book, error) {
     var bks []Book
     for rows.Next() {
         var bk Book
-        err := rows.Scan(&bk.Id, &bk.Name, &bk.Author, &bk.Year)
+        err := rows.Scan(&bk.Id, &bk.Name, &bk.Author, &bk.Year, &bk.Access)
         if err != nil {
             return nil, err
         }
         bks = append(bks, bk)
     }
+    //p.dbwrk.DB.Close()
 	return bks, nil
 }
 
 func (p *BookProvider) ReadById(id int) (Book, error) {
     p.Initialization()
-    rows, err := p.dbwrk.DB.Query("SELECT * FROM t_book WHERE Id=$1", id)
+    var ID int
+    var name string
+    var author string
+    var year int
+    var access bool
+    rows, err := p.dbwrk.DB.Query("SELECT id, name, author, year, access FROM t_book WHERE id=$1", id)
+    //наверное надо использовать QueryRow
     if err != nil {
         return Book{}, err
     }
     defer rows.Close()
-
-    var bk Book
     for rows.Next() {
-        err := rows.Scan(&bk.Id, &bk.Name, &bk.Author, &bk.Year)
+        err := rows.Scan(&ID, &name, &author, &year, &access)
         if err != nil {
             return Book{}, err
         }
     }
-    return bk, nil
+    return Book{ID, name, author, year, access}, nil
 }
 
-func (p *BookProvider) Create(book Book) (int, error) {
+func (p *BookProvider) Create(book Book) (Book, error) {
     p.Initialization()
     var id int
-    err := p.dbwrk.DB.QueryRow("INSERT INTO t_book(name, author, year) VALUES($1, " +
-        "$2, $3) RETURNING id", book.Name, book.Author, book.Year).Scan(&id)
+    err := p.dbwrk.DB.QueryRow("INSERT INTO t_book(name, author, year, access) VALUES($1, " +
+        "$2, $3, $4) RETURNING id", book.Name, book.Author, book.Year, true).Scan(&id)
     if err != nil {
-        return 0, err
+        return Book{}, err
+    }
+    b, err := p.ReadById(id)
+    if err != nil {
+        return Book{}, err
     } else {
-        return id, nil
+        return b, nil
     }
 }
 

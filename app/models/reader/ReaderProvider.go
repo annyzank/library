@@ -31,7 +31,7 @@ func (p *ReaderProvider) Initialization() error {
 
 func (p *ReaderProvider) ReadAll() ([]Reader, error) {
 	p.Initialization()
-	rows, err := p.dbwrk.DB.Query("SELECT * FROM t_reader ORDER BY id")
+	rows, err := p.dbwrk.DB.Query("SELECT id, name, surname, year FROM t_reader ORDER BY id")
 	if err != nil {
 		return nil, err
 	}
@@ -51,32 +51,40 @@ func (p *ReaderProvider) ReadAll() ([]Reader, error) {
 
 func (p *ReaderProvider) ReadById(id int) (Reader, error) {
 	p.Initialization()
-	rows, err := p.dbwrk.DB.Query("SELECT * FROM t_reader WHERE Id=$1", id)
+	var ID int
+	var name string
+	var surname string
+	var year int
+	rows, err := p.dbwrk.DB.Query("SELECT id, name, surname, year FROM t_reader WHERE id=$1", id)
+	//наверное надо использовать QueryRow
 	if err != nil {
 		return Reader{}, err
 	}
 	defer rows.Close()
-
-	var rdr Reader
 	for rows.Next() {
-		err := rows.Scan(&rdr.Id, &rdr.Name, &rdr.Surname, &rdr.Year)
+		err := rows.Scan(&ID, &name, &surname, &year)
 		if err != nil {
 			return Reader{}, err
 		}
 	}
-	return rdr, nil
+	return Reader{ID, name, surname, year}, nil
 }
 
-func (p *ReaderProvider) Create(reader Reader) (int, error) {
+func (p *ReaderProvider) Create(reader Reader) (Reader, error) {
 	p.Initialization()
 
     var id int
 	err := p.dbwrk.DB.QueryRow("INSERT INTO t_reader(name, surname, year) VALUES($1, " +
 		"$2, $3) RETURNING id", reader.Name, reader.Surname, reader.Year).Scan(&id)
+
     if err != nil {
-        return 0, err
-    } else {
-        return id, nil
+        return Reader{}, err
+    }
+	r, err := p.ReadById(id)
+	if err != nil {
+		return Reader{}, err
+	} else {
+        return r, nil
     }
 }
 

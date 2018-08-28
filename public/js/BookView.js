@@ -6,20 +6,29 @@ BookView.prototype.setMainLabel = function(count) {
 	$$("labelBooks").setValue("Всего книг в библиотеке: " + count)
 }
 
+BookView.prototype.error = function(errText) {	
+	webix.message({
+	    text: errText,
+	    type:"error"
+	});
+}
+
 BookView.prototype.showBooks = function(bookList) {	
+
+	var bkTable = $$("books");
 	if(!this._flag) {
-		var bkTable = $$("books");
-		bkTable.define("data", bookList);
 		bkTable.define("columns",[
 	        { id:"Id", header:"", width:50},
 	        { id:"Name",  header:"Наименование", fillspace:true},
 	        { id:"Author",  header:"Автор(ы)", fillspace:true},
 	        { id:"Year", header:"Год выпуска", width:100}
 	    ]);
-		//bkTable.define("template", '#id#. Наименование: "#bookName#", автор(ы): #author#, год выпуска: #bookYear#.');
 		this._flag = true;
 	}
+	console.log(bookList);
+	bkTable.define("data", bookList);
 	bkTable.refresh();
+	console.log(324);
 }
 
 BookView.prototype.showWindowBook = function() {
@@ -84,9 +93,9 @@ BookView.prototype.showChangeWindowBook = function() {
 		$$("addBookConfirm").hide();
 
 		var selChB = $$("books").getSelectedItem();
-		$$("bookName").setValue(selChB.bookName);
-		$$("author").setValue(selChB.author);
-		$$("bookYear").setValue(selChB.bookYear);
+		$$("bookName").setValue(selChB.Name);
+		$$("author").setValue(selChB.Author);
+		$$("bookYear").setValue(selChB.Year);
 	} else {
     	webix.alert({
     		type: "alert-error",
@@ -96,15 +105,17 @@ BookView.prototype.showChangeWindowBook = function() {
 
 }
 
-BookView.prototype.changeBookInfo = function(bookList) {
+BookView.prototype.changeBookInfo = function() {
 	var newBN = $$("bookName").getValue();
 	var newAN = $$("author").getValue();
 	var newY = $$("bookYear").getValue();
+	newY = Number(newY);
 
 	var chBk = $$("books").getSelectedItem();
-	var newBookObj = new Book(newBN, newAN, newY);
-	newBookObj.id = chBk.id;
-	$$("books").updateItem(chBk.id, newBookObj);
+	var newBookObj = new Bok(newBN, newAN, newY);
+	newBookObj.Id = chBk.Id;
+	newBookObj.id = chBk.Id;
+	$$("books").updateItem(chBk.Id, newBookObj);
 
 	newBookWin.hide();
 
@@ -112,7 +123,6 @@ BookView.prototype.changeBookInfo = function(bookList) {
 }
 
 BookView.prototype.showBooksForOrders = function(bookList) {
-	console.log(bookList);
 	var tableForOrders = $$("booksForOrder");
 	tableForOrders.clearAll();
 	tableForOrders.define("data", bookList);
@@ -125,18 +135,12 @@ BookView.prototype.showBooksForOrders = function(bookList) {
 	tableForOrders.refresh();
 
 	//Доработать!!
-	console.log(tableForOrders.count());
-	console.log(tableForOrders.getItem(tableForOrders.getLastId()));
 
-	// for (var i = 0; i < tableForOrders.count(); i++) {
-	// 	if (tableForOrders.getItem(tableForOrders.getIdByIndex(i)).deleted) {
-	// 		tableForOrders.remove(tableForOrders.getIdByIndex(i));
-	// 		i--;
-	// 	} else
-	// 	if (!tableForOrders.getItem(tableForOrders.getIdByIndex(i)).access) {
-	// 		tableForOrders.remove(tableForOrders.getIdByIndex(i));
-	// 		i--;
-	// 	}	
-	// }
+	for (var i = 0; i < tableForOrders.count(); i++) {
+		if (!tableForOrders.getItem(tableForOrders.getIdByIndex(i)).Access) {
+			tableForOrders.remove(tableForOrders.getIdByIndex(i));
+			i--;
+		} 
+	}
 }
 

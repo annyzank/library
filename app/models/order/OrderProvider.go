@@ -4,6 +4,7 @@ import "application/app/models/book"
 import (
     "application/app/models/reader"
     "application/app/lib"
+    "fmt"
 )
 
 //var orders []Order = []Order{{
@@ -88,12 +89,12 @@ func (p *OrderProvider) ReadAll() ([]Order, error) {
 func (p *OrderProvider) ReadById(id int) (Order, error) {
     p.Initialization()
     rows, err := p.dbwrk.DB.Query("SELECT t_order.id, t_reader.id, t_reader.name, t_reader.surname, " +
-        "t_reader.year, t_order.last_day FROM t_order, t_reader WHERE t_order.fk_reader=t_reader.id AND t_order.id=1")
+        "t_reader.year, t_order.last_day FROM t_order, t_reader WHERE t_order.fk_reader=t_reader.id AND t_order.id=$1", id)
     if err != nil {
         return Order{}, err
     }
     defer rows.Close()
-
+// исправить scan в промежуточные переменные
     var ordr Order
     var rdr reader.Reader
     for rows.Next() {
@@ -130,22 +131,26 @@ func (p *OrderProvider) ReadById(id int) (Order, error) {
     return ordr, nil
 }
 
-func (p *OrderProvider) Create(order Order) error {
+func (p *OrderProvider) Create(order Order) (int, error) {
     p.Initialization()
-    _, err := p.dbwrk.DB.Exec("INSERT INTO t_order(fk_reader, last_day) VALUES($1, " +
-        "$2)", order.Reader.Id, order.LastDay)
+    var id int
+    err := p.dbwrk.DB.QueryRow("INSERT INTO t_order(fk_reader, last_day) VALUES($1, " +
+        "$2) RETURNING id", order.Reader.Id, order.LastDay).Scan(&id)
+    order.Id = id
+
     if err != nil {
-        return err
+        return 0, err
     }
+    fmt.Println(order.Book)
 
     for _, x := range order.Book {
         _, err := p.dbwrk.DB.Exec("INSERT INTO toc_book_in_order(fk_book, fk_order) VALUES($1, " +
             "$2)", x.Id, order.Id)
         if err != nil {
-            return err
+            return 0, err
         }
     }
-    return nil
+    return id, nil
 }
 
 func (p *OrderProvider) Update(id int, order Order) error {
@@ -155,6 +160,8 @@ func (p *OrderProvider) Update(id int, order Order) error {
     if err != nil {
         return err
     }
+    fmt.Println(order.Reader.Id)
+    fmt.Println(order.LastDay)
 
     _, err = p.dbwrk.DB.Exec("DELETE FROM toc_book_in_order WHERE fk_order=$1", order.Id)
     if err != nil {
@@ -162,6 +169,8 @@ func (p *OrderProvider) Update(id int, order Order) error {
     }
 
     for _, x := range order.Book {
+        fmt.Println(x.Id)
+        fmt.Println(order.Id)
         _, err = p.dbwrk.DB.Exec("INSERT INTO toc_book_in_order(fk_book, fk_order) VALUES($1, " +
             "$2)", x.Id, order.Id)
         if err != nil {

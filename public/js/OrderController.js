@@ -10,12 +10,13 @@ OrderController.prototype.attachOrderEvents = function() {
 	
 	$$("tabbar").attachEvent("onItemClick", function(id, e) {	
 		var show = function(data) {
-			console.log(data)
 			self._orderView.showOrders(data);
 		}
+		var error = function(text) {
+			self._orderView.error(text);
+		}
 		if ($$('tabbar').getValue().localeCompare("orders") == 0) {
-			self._orderModel.getOrders(show);
-			//self._orderView.showOrders(self._orderModel.handling());
+			self._orderModel.getOrders(show, error);
 		}
 	});
 
@@ -25,14 +26,36 @@ OrderController.prototype.attachOrderEvents = function() {
 		}
 	});
 
+
 	$$("delete-button").attachEvent("onItemClick", function(id, e) {
+		var error = function(text) {
+			self._orderView.error(text);
+		}
+		var show = function() {
+			var showUpd = function(dataList) {
+				self._orderView.showOrders(dataList);
+			}
+			self._orderModel.getOrders(showUpd, error);
+		}
 		if ($$('tabbar').getValue().localeCompare("orders") == 0) {
-			self._orderModel.deleteOrder(self._orderView.deleteOrder());
+			self._orderModel.deleteOrder(self._orderView.deleteOrder(), show, error);
 		}	
 	});
 
+
+
 	$$("addOrderConfirm").attachEvent("onItemClick", function(id, e) {	
-		self._orderModel.addOrder(self._orderView.addOrder(self._orderModel.returnWantedId()));
+		var showAdded = function() {
+			var show = function(dataList) {
+				self._orderView.showOrders(dataList);
+			}
+			self._orderModel.getOrders(show, error);
+		}
+		var error = function(text) {
+			self._orderView.error(text);
+		}
+		self._orderModel.addOrder(self._orderView.addOrder(), showAdded, error);
+
 	});
 
 	$$("change-button").attachEvent("onItemClick", function(id, e) {	
@@ -41,8 +64,18 @@ OrderController.prototype.attachOrderEvents = function() {
 		}
 	});
 
-	$$("changeOrderConfirm").attachEvent("onItemClick", function(id, e) {	
-		self._orderModel.changeOrder(self._orderView.changeOrderInfo());
+
+	$$("changeOrderConfirm").attachEvent("onItemClick", function(id, e) {
+		var error = function(text) {
+			self._orderView.error(text);
+		}	
+		var show = function() {
+			var showUpd = function(dataList) {
+				self._orderView.showOrders(dataList);
+			}
+			self._orderModel.getOrders(showUpd, error);
+		}
+		self._orderModel.changeOrder(self._orderView.changeOrderInfo(), show, error);
 	});
 
 }

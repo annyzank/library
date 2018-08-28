@@ -60,7 +60,7 @@ startUI = {
                 {
                     header:"Список действующих заказов",
                     body:{
-                        view:"datatable",
+                        view:"treetable",
                         id:"orders",
                         select:true,
                     }
@@ -80,16 +80,14 @@ startUI = {
                         view:"button",
                         id:"add-button",
                         height: 100,
-                        value: "+",
-                        type:"form"
+                        value: "Добавить"
                     },
                     {height:60},                 
                     {
                         view:"button",
                         id:"delete-button",
                         height: 100,
-                        value: "-",
-                        type:"danger"
+                        value: "Удалить"
                     },
                     {height:60},
                     {
@@ -148,7 +146,6 @@ var newReaderWin = webix.ui({
     width:300,
     position:"center",
     modal:true,
-    head:"Добавление нового читателя",
     body:webix.copy(readerForm)
 });
 
@@ -192,7 +189,6 @@ var newBookWin = webix.ui({
     width:300,
     position:"center",
     modal:true,
-    head:"Добавление новой книги",
     body:webix.copy(bookForm)
 });
 
@@ -202,21 +198,38 @@ var orderForm = {
     id:"orderForm",
     elements: [{
         cols: [
-            { 
-                view:"datatable", 
-                height:200,
-                width:600,
-                id:"booksForOrder", 
-                select:true
+            {
+                rows: [
+                {
+                    view:"label", 
+                    label: "Книги",
+                    align:"center"
+                },
+                { 
+                    view:"datatable", 
+                    height:200,
+                    width:600,
+                    id:"booksForOrder", 
+                    multiselect:true,
+                    select:true
+                }]
             },
             {width:20},
-            { 
-                view:"datatable", 
-                height:200,
-                width:600,
-                id:"readersForOrder", 
-                select:true
-            }
+            {
+                rows: [
+                {
+                    view:"label", 
+                    label: "Читатели",
+                    align:"center"
+                },
+                { 
+                    view:"datatable", 
+                    height:200,
+                    width:600,
+                    id:"readersForOrder", 
+                    select:true
+                }]
+            }            
         ]},
         { view:"text", label:"Крайняя дата возвращения книги", name:"lastDay", id:"lastDay", invalidMessage:"Поле не может быть пустым" }, 
         {cols: [
@@ -261,7 +274,6 @@ var newOrderWin = webix.ui({
     //height:900,
     position:"center",
     modal:true,
-    head:"Добавление нового заказа",
     body:webix.copy(orderForm)
 });
 
